@@ -1,220 +1,375 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>Mobile QC — SteelSight AI</title>
+<link rel="icon" type="image/svg+xml" href="/static/steel-logo1.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0a0c10;--bg2:#111418;--bg3:#181c22;--border:#ffffff15;--text:#f0f2f5;--text2:#9aa3b0;--text3:#5a6272;--blue:#4A9EFF;--green:#34d399;--red:#f87171;--amber:#fbbf24;--steel:#7eb8d4}
+:root{
+  --bg:#0a0c10;--bg2:#111418;--bg3:#181c22;--bg4:#1e242c;
+  --border:#ffffff15;--border2:#ffffff22;
+  --text:#f0f2f5;--text2:#9aa3b0;--text3:#5a6272;
+  --blue:#4A9EFF;--blue2:#2d7ee0;--green:#34d399;--red:#f87171;--amber:#fbbf24;
+  --steel:#7eb8d4;--radius:12px;
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;max-width:480px;margin:0 auto}
-.mobile-nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border);background:var(--bg)}
-.back-btn{color:var(--blue);font-size:0.88rem;text-decoration:none;display:flex;align-items:center;gap:0.4rem}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── PAGE SPLASH ── */
+#pageSplash{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.75rem;
+  transition:opacity 0.55s ease,visibility 0.55s ease;
+  overflow:hidden;
+  background:radial-gradient(ellipse at 50% 60%,#0d1e35 0%,#060c14 60%,#0a0c10 100%);
+}
+#pageSplash.hide{opacity:0;visibility:hidden;pointer-events:none}
+#pageSplash::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(74,158,255,0.18) 1px,transparent 1px),radial-gradient(circle,rgba(126,184,212,0.12) 1px,transparent 1px);background-size:40px 40px,70px 70px;background-position:0 0,20px 20px;animation:particleDrift 12s linear infinite;pointer-events:none}
+@keyframes particleDrift{0%{transform:translateY(0)}100%{transform:translateY(-40px)}}
+#pageSplash::after{content:'';position:absolute;bottom:0;left:0;right:0;height:200px;background:radial-gradient(ellipse 120% 60% at 50% 120%,rgba(74,158,255,0.12) 0%,transparent 70%);pointer-events:none}
+.splash-logo-wrap{opacity:0;transform:scale(0.4) rotate(-10deg);animation:splashPop 0.7s 0.1s cubic-bezier(0.34,1.56,0.64,1) forwards;filter:drop-shadow(0 0 24px rgba(74,158,255,0.5)) drop-shadow(0 0 8px rgba(74,158,255,0.3))}
+.splash-logo-wrap img{width:80px;height:80px}
+@keyframes splashPop{to{opacity:1;transform:scale(1) rotate(0deg)}}
+.splash-brand{font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;letter-spacing:-0.02em;opacity:0;animation:fadeUp 0.5s 0.5s ease forwards;display:flex;align-items:baseline;gap:0.3rem}
+.splash-brand .steel-part{color:#f0f2f5}
+.splash-brand .ai-part{color:var(--blue)}
+.splash-loading-text{font-size:0.75rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.1em;opacity:0;animation:fadeUp 0.5s 0.65s ease forwards}
+.splash-bar-wrap{width:190px;height:2px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;opacity:0;animation:fadeUp 0.5s 0.7s ease forwards}
+.splash-bar{height:100%;background:linear-gradient(90deg,var(--blue),var(--steel),var(--blue));background-size:200% 100%;border-radius:2px;animation:splashLoad 1.6s 0.75s cubic-bezier(0.4,0,0.2,1) forwards,shimmerBar 1.5s 0.75s linear infinite;width:0}
+@keyframes splashLoad{0%{width:0}65%{width:82%}100%{width:100%}}
+@keyframes shimmerBar{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── NAV ── */
+.mobile-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.9rem 1.25rem;border-bottom:1px solid var(--border);
+  background:rgba(10,12,16,0.95);position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
+}
+.back-btn{color:var(--blue);font-size:0.85rem;text-decoration:none;display:flex;align-items:center;gap:0.35rem}
 .mobile-title{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+.live-badge{display:flex;align-items:center;gap:0.4rem;font-size:0.68rem;color:var(--green);font-family:'DM Mono',monospace}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:livePulse 1.5s infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.75)}}
 
-.hero-band{background:var(--bg2);border-bottom:1px solid var(--border);padding:1.25rem}
-.hero-band h2{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:0.25rem}
-.hero-band p{font-size:0.82rem;color:var(--text2)}
+/* ── CONTENT WRAPPER ── */
+.content{max-width:560px;margin:0 auto;padding-bottom:3rem}
 
-.camera-zone{margin:1.25rem;border:2px dashed var(--border);border-radius:16px;overflow:hidden;background:var(--bg2);position:relative;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:border-color 0.2s}
-.camera-zone.active{border-color:var(--blue)}
+/* Hero band */
+.hero-band{background:var(--bg2);border-bottom:1px solid var(--border);padding:1.1rem 1.25rem}
+.hero-band h2{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;margin-bottom:0.2rem}
+.hero-band p{font-size:0.8rem;color:var(--text2)}
+
+/* Camera zone */
+.camera-zone{
+  margin:1.1rem 1.25rem;border:2px dashed var(--border2);border-radius:16px;
+  overflow:hidden;background:var(--bg2);position:relative;min-height:220px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;transition:border-color 0.2s,background 0.2s;
+}
+.camera-zone.active{border-color:var(--blue);background:rgba(74,158,255,0.04)}
 .camera-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.cam-icon{width:60px;height:60px;background:var(--bg3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
-.cam-icon svg{width:28px;height:28px;stroke:var(--steel);fill:none;stroke-width:1.5}
-.cam-label{font-weight:500;font-size:0.95rem;margin-bottom:0.3rem}
-.cam-sub{font-size:0.78rem;color:var(--text3)}
-#previewImg{width:100%;display:block;border-radius:14px}
+.cam-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;text-align:center;pointer-events:none}
+.cam-icon{width:56px;height:56px;background:var(--bg3);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.9rem}
+.cam-icon svg{width:26px;height:26px;stroke:var(--steel);fill:none;stroke-width:1.5}
+.cam-label{font-weight:500;font-size:0.92rem;margin-bottom:0.25rem}
+.cam-sub{font-size:0.75rem;color:var(--text3)}
+#previewImg{width:100%;display:none;border-radius:14px;max-height:300px;object-fit:cover}
 
-.form-section{padding:0 1.25rem;margin-bottom:1rem}
-.form-label{font-size:0.72rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.08em;display:block;margin-bottom:0.4rem}
-.form-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:0.7rem 1rem;color:var(--text);font-size:0.88rem;font-family:'DM Sans',sans-serif;outline:none}
+/* Form */
+.form-section{padding:0 1.25rem;margin-bottom:0.85rem}
+.form-label{font-size:0.7rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.08em;display:block;margin-bottom:0.4rem;text-transform:uppercase}
+.form-input{
+  width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+  padding:0.7rem 1rem;color:var(--text);font-size:0.88rem;
+  font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s;
+}
+.form-input:focus{border-color:var(--blue2)}
+select.form-input option{background:var(--bg3)}
 
-.scan-btn{margin:0 1.25rem 1.25rem;width:calc(100% - 2.5rem);background:var(--blue);color:white;border:none;border-radius:12px;padding:1rem;font-size:1rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:0.6rem;transition:all 0.2s}
-.scan-btn:disabled{opacity:0.4;cursor:not-allowed}
-.scan-btn svg{width:20px;height:20px;stroke:white;fill:none;stroke-width:2}
+/* Scan button */
+.scan-btn{
+  margin:0.25rem 1.25rem 1.1rem;width:calc(100% - 2.5rem);
+  background:var(--blue);color:white;border:none;border-radius:12px;
+  padding:0.95rem;font-size:0.95rem;font-weight:500;cursor:pointer;
+  font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:0.6rem;
+  transition:all 0.2s;
+}
+.scan-btn:hover{background:var(--blue2)}
+.scan-btn:disabled{opacity:0.38;cursor:not-allowed}
+.scan-btn svg{width:18px;height:18px;stroke:white;fill:none;stroke-width:2}
 
-/* RESULT CARD */
-.result-card{margin:0 1.25rem 1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:none}
-.result-verdict{padding:1.25rem;display:flex;align-items:center;justify-content:space-between}
-.verdict-big{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800}
+/* Loading spinner */
+.spinner-wrap{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:2.5rem 1.25rem;gap:1rem;
+}
+.spinner-wrap.show{display:flex}
+.spinner-ring{width:44px;height:44px;position:relative}
+.spinner-ring::before,.spinner-ring::after{content:'';position:absolute;inset:0;border-radius:50%}
+.spinner-ring::before{border:2px solid var(--border2)}
+.spinner-ring::after{border:2px solid transparent;border-top-color:var(--blue);animation:spin 0.75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-text{font-size:0.83rem;color:var(--text2)}
+.spin-step{font-size:0.7rem;color:var(--text3);font-family:'DM Mono',monospace}
+
+/* Result card */
+.result-card{margin:0 1.25rem 1.1rem;background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;display:none}
+
+.result-verdict{padding:1.1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.verdict-big{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800}
 .verdict-big.PASS{color:var(--green)}.verdict-big.FAIL{color:var(--red)}.verdict-big.REVIEW{color:var(--amber)}
-.verdict-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-.verdict-icon.PASS{background:rgba(52,211,153,0.15)}
-.verdict-icon.FAIL{background:rgba(248,113,113,0.15)}
-.verdict-icon.REVIEW{background:rgba(251,191,36,0.15)}
-.verdict-icon svg{width:26px;height:26px;stroke-width:2.5;fill:none}
-.verdict-icon.PASS svg{stroke:var(--green)}.verdict-icon.FAIL svg{stroke:var(--red)}.verdict-icon.REVIEW svg{stroke:var(--amber)}
+.verdict-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.verdict-icon.PASS{background:rgba(52,211,153,0.15)}.verdict-icon.FAIL{background:rgba(248,113,113,0.15)}.verdict-icon.REVIEW{background:rgba(251,191,36,0.15)}
+.verdict-icon svg{width:24px;height:24px;stroke-width:2.5;fill:none}
 
 .result-images{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
 .result-img-wrap{border-right:1px solid var(--border)}
 .result-img-wrap:last-child{border:none}
-.img-label{font-size:0.65rem;color:var(--text3);font-family:'DM Mono',monospace;padding:0.5rem 0.75rem;letter-spacing:0.06em;border-bottom:1px solid var(--border)}
-.result-img-wrap img{width:100%;display:block;height:130px;object-fit:cover}
+.img-label{font-size:0.63rem;color:var(--text3);font-family:'DM Mono',monospace;padding:0.45rem 0.75rem;letter-spacing:0.06em;border-bottom:1px solid var(--border)}
+.result-img-wrap img{width:100%;display:block;height:120px;object-fit:cover}
 
-.defect-chips{padding:0.9rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.5rem}
-.chip{font-size:0.72rem;padding:4px 10px;border-radius:20px;font-family:'DM Mono',monospace}
+.defect-chips{padding:0.8rem;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:0.4rem}
+.chip{font-size:0.7rem;padding:4px 10px;border-radius:20px;font-family:'DM Mono',monospace}
 
-.cost-strip{padding:0.85rem 1rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.cost-label{font-size:0.72rem;color:var(--text3);font-family:'DM Mono',monospace}
-.cost-val{font-size:1.1rem;font-weight:600;font-family:'Syne',sans-serif;color:var(--amber)}
+.cost-strip{padding:0.8rem 1rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cost-label{font-size:0.7rem;color:var(--text3);font-family:'DM Mono',monospace}
+.cost-val{font-size:1.05rem;font-weight:600;font-family:'Syne',sans-serif;color:var(--amber)}
 
-.coil-strip{padding:0.75rem 1rem;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text3);font-family:'DM Mono',monospace;display:flex;justify-content:space-between}
+.coil-strip{padding:0.65rem 1rem;border-top:1px solid var(--border);font-size:0.72rem;color:var(--text3);font-family:'DM Mono',monospace;display:flex;justify-content:space-between;gap:0.5rem;flex-wrap:wrap}
 
-.spinner-wrap{display:none;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1.25rem;gap:1rem}
-.spinner-wrap.show{display:flex}
-.spinner{width:44px;height:44px;border:2px solid #ffffff15;border-top-color:var(--blue);border-radius:50%;animation:spin 0.8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.sync-notice{margin:0 1.25rem 1.25rem;background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.2);border-radius:10px;padding:0.75rem 1rem;font-size:0.78rem;color:var(--blue);display:none;align-items:center;gap:0.6rem}
+/* Sync notice */
+.sync-notice{
+  margin:0 1.25rem 1.1rem;background:rgba(74,158,255,0.07);
+  border:1px solid rgba(74,158,255,0.2);border-radius:10px;
+  padding:0.7rem 1rem;font-size:0.77rem;color:var(--blue);
+  display:none;align-items:center;gap:0.6rem;
+}
 .sync-notice.show{display:flex}
-.sync-notice svg{width:16px;height:16px;stroke:var(--blue);fill:none;flex-shrink:0}
+.sync-notice svg{width:15px;height:15px;stroke:var(--blue);fill:none;flex-shrink:0}
 
-footer{padding:1.5rem;text-align:center;font-size:0.72rem;color:var(--text3);font-family:'DM Mono',monospace;border-top:1px solid var(--border)}
+/* Desktop layout */
+@media(min-width:640px){
+  body{background:var(--bg)}
+  .content{padding:1.5rem 0 3rem}
+  .hero-band{border-radius:var(--radius);margin:0 0 1.1rem;border:1px solid var(--border)}
+  .camera-zone{min-height:260px}
+  .result-img-wrap img{height:150px}
+  .result-verdict{padding:1.25rem}
+}
+@media(min-width:900px){
+  .content{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;max-width:860px;align-items:start;padding-top:2rem}
+  .hero-band{grid-column:1/-1;margin:0}
+  .left-col{grid-column:1;display:flex;flex-direction:column;gap:0}
+  .right-col{grid-column:2;display:flex;flex-direction:column;gap:0.85rem}
+  .spinner-wrap,.result-card,.sync-notice{margin:0}
+  .scan-btn{margin:0.25rem 0 1.1rem}
+  .form-section{padding:0}
+  .camera-zone{margin:0 0 1.1rem}
+}
 </style>
 </head>
 <body>
+
+<!-- PAGE SPLASH -->
+<div id="pageSplash">
+  <div class="splash-logo-wrap">
+    <img src="/static/steel-logo1.png" alt="SteelSight AI Logo" width="80" height="80">
+  </div>
+  <div class="splash-brand">
+    <span class="steel-part">SteelSight</span>
+    <span class="ai-part">AI</span>
+  </div>
+  <div class="splash-loading-text">Loading Intelligence...</div>
+  <div class="splash-bar-wrap"><div class="splash-bar"></div></div>
+</div>
+
+<!-- NAV -->
 <div class="mobile-nav">
-  <a href="/" class="back-btn">← Back</a>
-  <div class="mobile-title">Mobile QC</div>
-  <div class="live-dot"></div>
-</div>
-
-<div class="hero-band">
-  <h2>Floor Inspector</h2>
-  <p>Photograph steel coil surface for instant AI quality verdict</p>
-</div>
-
-<div class="camera-zone" id="cameraZone">
-  <input type="file" id="camInput" accept="image/*" capture="environment">
-  <div id="camPrompt">
-    <div class="cam-icon"><svg viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
-    <div class="cam-label">Tap to photograph coil surface</div>
-    <div class="cam-sub">Camera opens automatically on mobile</div>
+  <a href="/" class="back-btn">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+    Back
+  </a>
+  <div style="display:flex;align-items:center;gap:0.45rem">
+    <img src="/static/steel-logo1.png" alt="Logo" style="width:26px;height:26px">
+    <div class="mobile-title">SteelSight AI</div>
   </div>
-  <img id="previewImg" style="display:none">
+  <div class="live-badge"><div class="live-dot"></div>LIVE</div>
 </div>
 
-<div class="form-section">
-  <label class="form-label">Coil ID</label>
-  <input class="form-input" type="text" id="coilInput" placeholder="Scan or enter coil ID">
-</div>
-<div class="form-section">
-  <label class="form-label">Steel Grade</label>
-  <select class="form-input" id="gradeInput">
-    <option>HR (Hot Rolled)</option>
-    <option>CR (Cold Rolled)</option>
-    <option>Galvanised (GI/GL)</option>
-    <option>API Grade</option>
-  </select>
-</div>
+<!-- CONTENT -->
+<div class="content" id="contentRoot">
+  <div class="hero-band">
+    <h2>Floor Inspector</h2>
+    <p>Photograph steel coil surface for instant AI quality verdict</p>
+  </div>
 
-<button class="scan-btn" id="scanBtn" disabled>
-  <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-  Analyse Defects
-</button>
-
-<div class="spinner-wrap" id="spinnerWrap">
-  <div class="spinner"></div>
-  <div style="font-size:0.85rem;color:var(--text2)">Running AI analysis...</div>
-  <div style="font-size:0.72rem;color:var(--text3);font-family:'DM Mono',monospace" id="mobileStep">Preprocessing image</div>
-</div>
-
-<div class="result-card" id="resultCard">
-  <div class="result-verdict">
-    <div>
-      <div style="font-size:0.68rem;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:0.3rem">QUALITY VERDICT</div>
-      <div class="verdict-big" id="mVerdict">—</div>
-      <div style="font-size:0.78rem;color:var(--text2);margin-top:0.2rem" id="mSeverity">—</div>
+  <!-- LEFT (or full-width on mobile) -->
+  <div class="left-col" id="leftCol">
+    <div class="camera-zone" id="cameraZone">
+      <input type="file" id="camInput" accept="image/*" capture="environment">
+      <div class="cam-inner" id="camPrompt">
+        <div class="cam-icon">
+          <svg viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        </div>
+        <div class="cam-label">Tap to photograph coil surface</div>
+        <div class="cam-sub">Camera opens automatically on mobile</div>
+      </div>
+      <img id="previewImg" alt="Preview">
     </div>
-    <div class="verdict-icon" id="mVerdictIcon">
-      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+
+    <div class="form-section">
+      <label class="form-label">Coil ID</label>
+      <input class="form-input" type="text" id="coilInput" placeholder="Scan or enter coil ID">
+    </div>
+    <div class="form-section">
+      <label class="form-label">Steel Grade</label>
+      <select class="form-input" id="gradeInput">
+        <option value="" disabled selected>Loading...</option>
+      </select>
+    </div>
+
+    <button class="scan-btn" id="scanBtn" disabled>
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Analyse Defects
+    </button>
+  </div>
+
+  <!-- RIGHT (or below on mobile) -->
+  <div class="right-col" id="rightCol">
+    <div class="spinner-wrap" id="spinnerWrap">
+      <div class="spinner-ring"></div>
+      <div class="spin-text">Running AI analysis...</div>
+      <div class="spin-step" id="mobileStep">Preprocessing image</div>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-verdict">
+        <div>
+          <div style="font-size:0.66rem;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:0.25rem">QUALITY VERDICT</div>
+          <div class="verdict-big" id="mVerdict">—</div>
+          <div style="font-size:0.76rem;color:var(--text2);margin-top:0.15rem" id="mSeverity">—</div>
+        </div>
+        <div class="verdict-icon" id="mVerdictIcon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--text3)" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+      </div>
+      <div class="result-images">
+        <div class="result-img-wrap"><div class="img-label">DETECTED</div><img id="mAnnotated" src="" alt="Annotated"></div>
+        <div class="result-img-wrap"><div class="img-label">GRAD-CAM</div><img id="mGradcam" src="" alt="Heatmap"></div>
+      </div>
+      <div class="defect-chips" id="mChips"></div>
+      <div class="cost-strip">
+        <div class="cost-label">Quality Cost Estimate</div>
+        <div class="cost-val" id="mCost">₹0</div>
+      </div>
+      <div class="coil-strip">
+        <span id="mCoilId">—</span>
+        <span id="mTime">—</span>
+      </div>
+    </div>
+
+    <div class="sync-notice" id="syncNotice">
+      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Result synced to central dashboard
     </div>
   </div>
-  <div class="result-images">
-    <div class="result-img-wrap"><div class="img-label">DETECTED</div><img id="mAnnotated" src="" alt=""></div>
-    <div class="result-img-wrap"><div class="img-label">GRAD-CAM</div><img id="mGradcam" src="" alt=""></div>
-  </div>
-  <div class="defect-chips" id="mChips"></div>
-  <div class="cost-strip">
-    <div class="cost-label">Quality Cost Estimate</div>
-    <div class="cost-val" id="mCost">₹0</div>
-  </div>
-  <div class="coil-strip">
-    <span id="mCoilId">—</span>
-    <span id="mTime">—</span>
-  </div>
 </div>
-
-<div class="sync-notice" id="syncNotice">
-  <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-  Result synced to central dashboard
-</div>
-
-<footer>SteelSight AI · Mobile QC Inspector · Tata Steel</footer>
 
 <script>
-const camInput=document.getElementById('camInput');
-const scanBtn=document.getElementById('scanBtn');
-const steps=['Preprocessing image...','Running defect detection...','Generating heatmap...','Calculating cost...','Syncing to dashboard...'];
+const DEFECT_COLORS = { crazing:'#FF6B6B', inclusion:'#FFD93D', patches:'#6BCB77', pitted_surface:'#4D96FF', rolled_in_scale:'#FF922B', scratches:'#CC5DE8' };
+const steps = ['Preprocessing image...','Running defect detection...','Generating heatmap...','Calculating cost...','Syncing to dashboard...'];
 
-camInput.addEventListener('change',()=>{
-  if(camInput.files[0]){
-    scanBtn.disabled=false;
-    const r=new FileReader();
-    r.onload=e=>{
-      document.getElementById('previewImg').src=e.target.result;
-      document.getElementById('previewImg').style.display='block';
-      document.getElementById('camPrompt').style.display='none';
+// Splash + load grades
+window.addEventListener('load', () => {
+  loadGrades().finally(() => {
+    setTimeout(() => document.getElementById('pageSplash').classList.add('hide'), 1500);
+  });
+});
+
+function loadGrades() {
+  return fetch('/api/grades').then(r => r.json()).then(grades => {
+    const sel = document.getElementById('gradeInput');
+    sel.innerHTML = grades.map(g => `<option value="${g}">${g}</option>`).join('');
+  }).catch(() => {
+    document.getElementById('gradeInput').innerHTML =
+      '<option>HR (Hot Rolled)</option><option>CR (Cold Rolled)</option><option>Galvanised (GI/GL)</option><option>API Grade</option>';
+  });
+}
+
+// File input
+const camInput = document.getElementById('camInput');
+const scanBtn = document.getElementById('scanBtn');
+const cameraZone = document.getElementById('cameraZone');
+
+camInput.addEventListener('change', () => {
+  if (camInput.files[0]) {
+    scanBtn.disabled = false;
+    cameraZone.classList.add('active');
+    const r = new FileReader();
+    r.onload = e => {
+      const img = document.getElementById('previewImg');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      document.getElementById('camPrompt').style.display = 'none';
     };
     r.readAsDataURL(camInput.files[0]);
   }
 });
 
-scanBtn.addEventListener('click',()=>{
-  if(!camInput.files[0])return;
-  document.getElementById('resultCard').style.display='none';
+scanBtn.addEventListener('click', () => {
+  if (!camInput.files[0]) return;
+  document.getElementById('resultCard').style.display = 'none';
   document.getElementById('syncNotice').classList.remove('show');
   document.getElementById('spinnerWrap').classList.add('show');
-  let si=0;
-  const st=setInterval(()=>{if(si<steps.length)document.getElementById('mobileStep').textContent=steps[si++];},400);
-  const fd=new FormData();
-  fd.append('file',camInput.files[0]);
-  fd.append('grade',document.getElementById('gradeInput').value);
-  fd.append('coil_id',document.getElementById('coilInput').value||`COIL-${Math.floor(Math.random()*90000+10000)}`);
-  fetch('/inspect',{method:'POST',body:fd}).then(r=>r.json()).then(d=>{
-    clearInterval(st);
-    document.getElementById('spinnerWrap').classList.remove('show');
-    renderMobileResult(d);
-  }).catch(()=>{clearInterval(st);document.getElementById('spinnerWrap').classList.remove('show');});
+  let si = 0;
+  const st = setInterval(() => {
+    if (si < steps.length) document.getElementById('mobileStep').textContent = steps[si++];
+  }, 380);
+  const fd = new FormData();
+  fd.append('file', camInput.files[0]);
+  fd.append('grade', document.getElementById('gradeInput').value);
+  fd.append('coil_id', document.getElementById('coilInput').value || `COIL-${Math.floor(Math.random()*90000+10000)}`);
+  fetch('/inspect', { method:'POST', body:fd })
+    .then(r => r.json())
+    .then(d => { clearInterval(st); document.getElementById('spinnerWrap').classList.remove('show'); renderMobileResult(d); })
+    .catch(() => { clearInterval(st); document.getElementById('spinnerWrap').classList.remove('show'); });
 });
 
-const DEFECT_COLORS={'crazing':'#FF6B6B','inclusion':'#FFD93D','patches':'#6BCB77','pitted_surface':'#4D96FF','rolled_in_scale':'#FF922B','scratches':'#CC5DE8'};
+function renderMobileResult(d) {
+  const rc = document.getElementById('resultCard');
+  rc.style.display = 'block';
+  const mv = document.getElementById('mVerdict');
+  mv.textContent = d.verdict;
+  mv.className = 'verdict-big ' + d.verdict;
+  const vi = document.getElementById('mVerdictIcon');
+  vi.className = 'verdict-icon ' + d.verdict;
+  if (d.verdict === 'PASS') {
+    vi.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="var(--green)"/><polyline points="22 4 12 14.01 9 11.01" stroke="var(--green)"/></svg>`;
+  } else if (d.verdict === 'FAIL') {
+    vi.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke="var(--red)"/><line x1="15" y1="9" x2="9" y2="15" stroke="var(--red)"/><line x1="9" y1="9" x2="15" y2="15" stroke="var(--red)"/></svg>`;
+  } else {
+    vi.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke="var(--amber)"/><line x1="12" y1="8" x2="12" y2="12" stroke="var(--amber)"/><circle cx="12" cy="16" r="1" fill="var(--amber)"/></svg>`;
+  }
+  document.getElementById('mSeverity').textContent = `${d.defect_count} defect(s) · Max severity: ${d.max_severity}`;
+  document.getElementById('mAnnotated').src = '/static/uploads/' + d.annotated;
+  document.getElementById('mGradcam').src = '/static/uploads/' + d.gradcam;
+  const chips = document.getElementById('mChips');
+  chips.innerHTML = d.defect_details.length
+    ? d.defect_details.map(df => `<span class="chip" style="background:${df.color}22;color:${df.color}">${df.display}</span>`).join('')
+    : '<span class="chip" style="background:rgba(52,211,153,0.15);color:#34d399">No defects detected</span>';
+  document.getElementById('mCost').textContent = '₹' + Number(d.cost.total).toLocaleString();
+  document.getElementById('mCoilId').textContent = d.coil_id;
+  document.getElementById('mTime').textContent = d.timestamp.slice(11,16);
+  setTimeout(() => document.getElementById('syncNotice').classList.add('show'), 800);
 
-function renderMobileResult(d){
-  const rc=document.getElementById('resultCard');
-  rc.style.display='block';
-  const mv=document.getElementById('mVerdict');
-  mv.textContent=d.verdict; mv.className='verdict-big '+d.verdict;
-  const vi=document.getElementById('mVerdictIcon');
-  vi.className='verdict-icon '+d.verdict;
-  vi.innerHTML=d.verdict==='PASS'
-    ?'<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="var(--green)"/><polyline points="22 4 12 14.01 9 11.01" stroke="var(--green)"/></svg>'
-    :d.verdict==='FAIL'
-    ?'<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke="var(--red)"/><line x1="15" y1="9" x2="9" y2="15" stroke="var(--red)"/><line x1="9" y1="9" x2="15" y2="15" stroke="var(--red)"/></svg>'
-    :'<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5"><circle cx="12" cy="12" r="10" stroke="var(--amber)"/><line x1="12" y1="8" x2="12" y2="12" stroke="var(--amber)"/><circle cx="12" cy="16" r="1" fill="var(--amber)"/></svg>';
-  document.getElementById('mSeverity').textContent=`${d.defect_count} defect(s) · Max severity: ${d.max_severity}`;
-  document.getElementById('mAnnotated').src='/static/uploads/'+d.annotated;
-  document.getElementById('mGradcam').src='/static/uploads/'+d.gradcam;
-  const chips=document.getElementById('mChips');
-  chips.innerHTML=d.defect_details.length
-    ?d.defect_details.map(df=>`<span class="chip" style="background:${df.color}22;color:${df.color}">${df.display}</span>`).join('')
-    :'<span class="chip" style="background:rgba(52,211,153,0.15);color:#34d399">No defects detected</span>';
-  document.getElementById('mCost').textContent='₹'+Number(d.cost.total).toLocaleString();
-  document.getElementById('mCoilId').textContent=d.coil_id;
-  document.getElementById('mTime').textContent=d.timestamp.slice(11,16);
-  setTimeout(()=>document.getElementById('syncNotice').classList.add('show'),800);
+  // Scroll to results on mobile
+  if (window.innerWidth < 900) {
+    rc.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
 }
 </script>
 </body>
