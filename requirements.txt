@@ -41,8 +41,7 @@ darkdetect==0.8.0
 datasets==4.8.4
 dbus-fast==4.0.0
 dbus-python==1.2.18
-# Editable install with no version control (deepface==0.0.99)
--e /home/ns-44/Downloads/deepface-master
+deepface==0.0.100
 defer==1.0.6
 defusedxml==0.7.1
 dill==0.4.1
@@ -139,7 +138,7 @@ nemo-emblems==5.6.0
 netaddr==0.8.0
 netifaces==0.11.0
 networkx==3.4.2
-numpy==1.26.4
+numpy==2.2.6
 nvidia-cublas==13.1.0.3
 nvidia-cuda-cupti==13.0.85
 nvidia-cuda-nvrtc==13.0.88
