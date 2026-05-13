@@ -1,7 +1,5 @@
-Flask
-gunicorn
-deepface
-tensorflow
-opencv-python-headless
-Pillow
-numpy
+Flask>=3.0
+gunicorn>=21.2
+Pillow>=10.0
+numpy>=1.24
+Werkzeug>=3.0
