@@ -3,5 +3,5 @@ gunicorn
 deepface
 tensorflow
 opencv-python-headless
-Pillow>=10.0.0
+Pillow
 numpy
