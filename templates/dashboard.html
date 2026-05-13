@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — SteelSight AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0a0c10;--bg2:#111418;--bg3:#181c22;--bg4:#1e242c;--border:#ffffff12;--border2:#ffffff20;--text:#f0f2f5;--text2:#9aa3b0;--text3:#5a6272;--blue:#4A9EFF;--blue2:#2d7ee0;--green:#34d399;--red:#f87171;--amber:#fbbf24;--purple:#a78bfa;--steel:#7eb8d4;--radius:12px;--radius-lg:18px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;border-bottom:1px solid var(--border);background:var(--bg);position:sticky;top:0;z-index:100}
+.nav-brand{display:flex;align-items:center;gap:0.75rem}
+.nav-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--steel));border-radius:8px;display:flex;align-items:center;justify-content:center}
+.nav-logo svg{width:18px;height:18px;fill:white}
+.brand-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem}
+.brand-sub{font-size:0.7rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.08em}
+.nav-links{display:flex;gap:0.5rem}
+.nav-link{padding:0.45rem 1rem;border-radius:8px;font-size:0.85rem;color:var(--text2);text-decoration:none;transition:all 0.2s}
+.nav-link:hover,.nav-link.active{background:var(--bg3);color:var(--text)}
+
+.page{max-width:1300px;margin:0 auto;padding:2rem 2.5rem 4rem}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem}
+.page-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-0.03em}
+.header-actions{display:flex;gap:0.75rem}
+.btn{padding:0.55rem 1.1rem;border-radius:8px;font-size:0.83rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;border:1px solid var(--border2);background:var(--bg2);color:var(--text2)}
+.btn:hover{background:var(--bg3);color:var(--text)}
+.btn-primary{background:var(--blue);color:white;border-color:var(--blue)}
+.btn-primary:hover{background:var(--blue2)}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:2rem}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.25rem}
+.kpi-label{font-size:0.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;font-family:'DM Mono',monospace;margin-bottom:0.4rem}
+.kpi-val{font-size:2rem;font-weight:700;font-family:'Syne',sans-serif}
+.kpi-val.green{color:var(--green)}.kpi-val.red{color:var(--red)}.kpi-val.blue{color:var(--blue)}.kpi-val.amber{color:var(--amber)}.kpi-val.purple{color:var(--purple)}
+.kpi-sub{font-size:0.73rem;color:var(--text3);margin-top:0.2rem}
+
+.charts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
+.chart-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem}
+.chart-title{font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:600;margin-bottom:0.3rem}
+.chart-sub{font-size:0.73rem;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:1rem}
+.chart-wrap{position:relative;height:180px}
+
+.bottom-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:1.25rem}
+
+/* LOG TABLE */
+.log-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.log-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.log-header h3{font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:600}
+.log-table{width:100%;border-collapse:collapse;font-size:0.8rem}
+.log-table th{padding:0.6rem 1rem;text-align:left;font-size:0.68rem;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:0.08em;border-bottom:1px solid var(--border);font-weight:400}
+.log-table td{padding:0.7rem 1rem;border-bottom:1px solid var(--border)}
+.log-table tr:last-child td{border:none}
+.log-table tr:hover td{background:var(--bg3)}
+.verdict-pill{font-size:0.68rem;padding:3px 9px;border-radius:20px;font-family:'DM Mono',monospace}
+.pill-pass{background:rgba(52,211,153,0.15);color:#34d399}
+.pill-fail{background:rgba(248,113,113,0.15);color:#f87171}
+.pill-review{background:rgba(251,191,36,0.15);color:#fbbf24}
+
+/* SHIFT REPORT */
+.shift-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.shift-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.shift-header h3{font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:600}
+.shift-body{padding:1.25rem}
+.narrative-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;font-size:0.82rem;color:var(--text2);line-height:1.75;white-space:pre-wrap;min-height:120px;font-family:'DM Sans',sans-serif}
+.report-meta{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem}
+.report-meta-item{background:var(--bg3);border-radius:8px;padding:0.75rem;border:1px solid var(--border)}
+.report-meta-label{font-size:0.68rem;color:var(--text3);font-family:'DM Mono',monospace;margin-bottom:0.25rem}
+.report-meta-val{font-size:1.1rem;font-weight:600;font-family:'Syne',sans-serif}
+
+.seed-notice{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;font-size:0.83rem;color:var(--text2)}
+
+@media(max-width:1000px){.charts-grid{grid-template-columns:1fr 1fr}.kpi-grid{grid-template-columns:repeat(3,1fr)}.bottom-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">
+    <div class="nav-logo"><svg viewBox="0 0 20 20"><path d="M2 10 L10 2 L18 10 L10 18 Z" fill="white" opacity="0.9"/><path d="M6 10 L10 6 L14 10 L10 14 Z" fill="white"/></svg></div>
+    <div><div class="brand-name">SteelSight AI</div><div class="brand-sub">TATA STEEL · QUALITY INTELLIGENCE</div></div>
+  </div>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Inspect</a>
+    <a href="/dashboard" class="nav-link active">Dashboard</a>
+    <a href="/mobile" class="nav-link">Mobile QC</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div><div class="page-title">Shift Intelligence Dashboard</div><div style="font-size:0.8rem;color:var(--text3);margin-top:0.25rem" id="lastUpdated">Loading...</div></div>
+    <div class="header-actions">
+      <button class="btn" onclick="seedDemo()">Load Demo Data</button>
+      <button class="btn" onclick="generateShiftReport()">Generate Shift Report</button>
+      <button class="btn btn-primary" onclick="location.href='/'">New Inspection</button>
+    </div>
+  </div>
+
+  <div class="seed-notice" id="seedNotice" style="display:none">
+    Demo data loaded — 15 simulated coil inspections added to demonstrate dashboard capabilities.
+    <button class="btn" onclick="document.getElementById('seedNotice').style.display='none'" style="padding:4px 10px;font-size:0.75rem">Dismiss</button>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Total Inspections</div><div class="kpi-val blue" id="kTotal">0</div><div class="kpi-sub">This session</div></div>
+    <div class="kpi"><div class="kpi-label">Pass Rate</div><div class="kpi-val green" id="kPass">—</div><div class="kpi-sub">Accepted coils</div></div>
+    <div class="kpi"><div class="kpi-label">Failed Coils</div><div class="kpi-val red" id="kFail">0</div><div class="kpi-sub">High severity defects</div></div>
+    <div class="kpi"><div class="kpi-label">Under Review</div><div class="kpi-val amber" id="kReview">0</div><div class="kpi-sub">Medium severity</div></div>
+    <div class="kpi"><div class="kpi-label">Total Cost (INR)</div><div class="kpi-val purple" id="kCost">₹0</div><div class="kpi-sub">Quality losses</div></div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Verdict Distribution</div>
+      <div class="chart-sub">PASS / REVIEW / FAIL breakdown</div>
+      <div class="chart-wrap"><canvas id="verdictChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Defect Frequency</div>
+      <div class="chart-sub">By defect class this session</div>
+      <div class="chart-wrap"><canvas id="defectChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Inspection Timeline</div>
+      <div class="chart-sub">Defective coils over time</div>
+      <div class="chart-wrap"><canvas id="timelineChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="log-card">
+      <div class="log-header"><h3>Recent Inspection Log</h3><span style="font-size:0.72rem;color:var(--text3);font-family:'DM Mono',monospace" id="logCount">0 records</span></div>
+      <table class="log-table">
+        <thead><tr><th>Coil ID</th><th>Verdict</th><th>Defects</th><th>Grade</th><th>Cost (INR)</th><th>Time</th></tr></thead>
+        <tbody id="logBody"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">No inspections yet</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="shift-card">
+      <div class="shift-header">
+        <h3>AI Shift Intelligence Report</h3>
+        <span style="font-size:0.68rem;padding:3px 9px;background:rgba(167,139,250,0.15);color:var(--purple);border-radius:4px;font-family:'DM Mono',monospace">AGENTIC AI</span>
+      </div>
+      <div class="shift-body">
+        <div class="narrative-box" id="narrativeBox">Click "Generate Shift Report" to create an AI-written summary of this shift's quality performance, cost impact, and recommended corrective actions.</div>
+        <div class="report-meta">
+          <div class="report-meta-item"><div class="report-meta-label">Inspections Covered</div><div class="report-meta-val" id="rptCount">—</div></div>
+          <div class="report-meta-item"><div class="report-meta-label">Shift Cost Impact</div><div class="report-meta-val" id="rptCost" style="color:var(--amber)">—</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS={PASS:'#34d399',FAIL:'#f87171',REVIEW:'#fbbf24'};
+const DEFECT_COLORS={'crazing':'#FF6B6B','inclusion':'#FFD93D','patches':'#6BCB77','pitted_surface':'#4D96FF','rolled_in_scale':'#FF922B','scratches':'#CC5DE8'};
+let verdictChart,defectChart,timelineChart;
+
+function initCharts(){
+  const cfg={responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#9aa3b0',font:{family:'DM Mono',size:11}}}}};
+  verdictChart=new Chart(document.getElementById('verdictChart'),{type:'doughnut',data:{labels:['Pass','Fail','Review'],datasets:[{data:[0,0,0],backgroundColor:['#34d39933','#f8717133','#fbbf2433'],borderColor:['#34d399','#f87171','#fbbf24'],borderWidth:2}]},options:{...cfg,cutout:'65%'}});
+  defectChart=new Chart(document.getElementById('defectChart'),{type:'bar',data:{labels:[],datasets:[{data:[],backgroundColor:'#4A9EFF44',borderColor:'#4A9EFF',borderWidth:1,borderRadius:4}]},options:{...cfg,scales:{x:{ticks:{color:'#5a6272',font:{size:10}},grid:{color:'#ffffff08'}},y:{ticks:{color:'#5a6272',font:{size:10}},grid:{color:'#ffffff08'}}},plugins:{legend:{display:false}}}});
+  timelineChart=new Chart(document.getElementById('timelineChart'),{type:'line',data:{labels:[],datasets:[{label:'Defective',data:[],borderColor:'#f87171',backgroundColor:'#f8717122',fill:true,tension:0.4,pointRadius:3}]},options:{...cfg,scales:{x:{ticks:{color:'#5a6272',font:{size:10}},grid:{display:false}},y:{ticks:{color:'#5a6272',font:{size:10},stepSize:1},grid:{color:'#ffffff08'}}}}});
+}
+
+function loadData(){
+  fetch('/api/dashboard-data').then(r=>r.json()).then(d=>{
+    document.getElementById('kTotal').textContent=d.total;
+    document.getElementById('kPass').textContent=d.pass_rate+'%';
+    document.getElementById('kFail').textContent=d.verdicts.FAIL||0;
+    document.getElementById('kReview').textContent=d.verdicts.REVIEW||0;
+    document.getElementById('kCost').textContent='₹'+Number(d.total_cost).toLocaleString();
+    document.getElementById('lastUpdated').textContent='Last updated '+new Date().toLocaleTimeString();
+    document.getElementById('logCount').textContent=d.total+' records';
+
+    verdictChart.data.datasets[0].data=[d.verdicts.PASS||0,d.verdicts.FAIL||0,d.verdicts.REVIEW||0];
+    verdictChart.update();
+
+    const dkeys=Object.keys(d.defect_freq);
+    defectChart.data.labels=dkeys.map(k=>k.replace(/_/g,' '));
+    defectChart.data.datasets[0].data=dkeys.map(k=>d.defect_freq[k]);
+    defectChart.data.datasets[0].backgroundColor=dkeys.map(k=>DEFECT_COLORS[k]+'55'||'#4A9EFF44');
+    defectChart.data.datasets[0].borderColor=dkeys.map(k=>DEFECT_COLORS[k]||'#4A9EFF');
+    defectChart.update();
+
+    const recent=d.recent.slice(-10);
+    timelineChart.data.labels=recent.map(r=>r.timestamp.slice(11,16));
+    timelineChart.data.datasets[0].data=recent.map(r=>r.defect_count);
+    timelineChart.update();
+
+    const tbody=document.getElementById('logBody');
+    if(!d.recent.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text3)">No inspections yet. <a href="/" style="color:var(--blue)">Run your first inspection</a></td></tr>';return;}
+    tbody.innerHTML=[...d.recent].reverse().slice(0,15).map(r=>`
+      <tr>
+        <td style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--steel)">${r.coil_id||'—'}</td>
+        <td><span class="verdict-pill pill-${r.verdict.toLowerCase()}">${r.verdict}</span></td>
+        <td style="color:var(--text2)">${r.defect_count}</td>
+        <td style="font-size:0.75rem;color:var(--text3)">${(r.grade||'—').split(' ')[0]}</td>
+        <td style="font-family:'DM Mono',monospace;color:var(--amber)">₹${Number(r.cost_inr||0).toLocaleString()}</td>
+        <td style="font-size:0.75rem;color:var(--text3)">${r.timestamp.slice(11,16)}</td>
+      </tr>`).join('');
+  });
+}
+
+function generateShiftReport(){
+  document.getElementById('narrativeBox').textContent='Generating AI report...';
+  fetch('/api/shift-report').then(r=>r.json()).then(d=>{
+    document.getElementById('narrativeBox').textContent=d.narrative;
+    document.getElementById('rptCount').textContent=d.count;
+    document.getElementById('rptCost').textContent='₹'+Number(d.total_cost).toLocaleString();
+  });
+}
+
+function seedDemo(){
+  fetch('/api/seed-demo').then(()=>{
+    document.getElementById('seedNotice').style.display='flex';
+    loadData();
+  });
+}
+
+initCharts();
+loadData();
+setInterval(loadData,15000);
+</script>
+</body>
+</html>

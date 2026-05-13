@@ -1,0 +1,15 @@
+flask==3.0.3
+werkzeug==3.0.3
+Pillow==10.3.0
+numpy==1.26.4
+
+# AI/ML (install for production model)
+# ultralytics==8.2.0
+# torch==2.3.0
+# torchvision==0.18.0
+
+# Optional: Grad-CAM
+# grad-cam==1.5.2
+
+# Optional: PDF report export
+# reportlab==4.2.0
